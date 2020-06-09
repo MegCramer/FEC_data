@@ -198,10 +198,10 @@ def schedule_b_results_to_rows(results):
         row = []
 
         for result_key in dotted_result_keys_to_column_names.key():
-            if result_key not in dotted_result_keys_to_column_names.key():
+            if result_key not in result:
                 normalized = None
             elif isinstance(result[result_key],list):
-                normalized = ', '.join(result[result_key])
+                normalized = ','.join(result[result_key])
             else:
                 normalized = result[result_key]
             # Use the dotted key to lookup the value we want and append it to the row.
