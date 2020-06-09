@@ -155,25 +155,53 @@ dotted_result_keys_to_column_names = OrderedDict({
     'unused_recipient_committee_id': 'unused_recipient_committee_id'
 })
 
-def get_schedule_b_results(
+def get_all_schedule_b_results(
     committee_id=['C00618389', 'C00637512'],
     recipient_name=['Jones Day'],
     disbursement_description=['legal consulting'],
     sort='-disbursement_date',
     two_year_transaction_period=[2018, 2020],
 ):
-    try:
-        api_response = disbursements_api.schedules_schedule_b_get(
-            api_key,
-            committee_id=committee_id,
-            recipient_name=recipient_name,
-            disbursement_description=disbursement_description,
-            sort=sort,
-            two_year_transaction_period=two_year_transaction_period
-        )
-        return api_response.to_dict()['results']
-    except ApiException as e:
-        print("Exception when calling DisbursementsApi->schedules_schedule_b_get: %s\n" % e)
+
+    records = True
+    # Trying to figure out if this works as a way to note when pagination is over... I think I might
+    # also have to ask someone from the OpenFEC how the endpoint is marked
+    # On the website it says "Note: because the Schedule B data includes many records, counts for
+    # large result sets are approximate; you will want to page through the records until no records are returned."
+    last_disbursement_date = None
+    last_index = None
+    results = []
+
+    while records is True:
+    # Need to limit this to 120 calls per minute
+        try:
+            api_response = disbursements_api.schedules_schedule_b_get(
+                api_key,
+                committee_id=committee_id,
+                # I added in these parameters because... I wanted to make the
+                # data set smaller to limit the number of API requests I'm making
+                recipient_name=recipient_name,
+                disbursement_description=disbursement_description,
+                sort=sort,
+                two_year_transaction_period=two_year_transaction_period,
+                # I think I need to figure out a way to make these last two things NOT parameters in the first pass
+                last_disbursement_date=last_disbursement_date,
+                last_index=last_index
+            )
+            # I moved this inside because I kept getting an error for it, and then it started the loop
+            # and the loop wouldn't stop
+            api_response_dict = api_response.to_dict()
+            #pages = api_response_dict['pagination']['pages']
+            last_index = api_response_dict['pagination']['last_indexes']['last_index']
+            last_disbursement_date = api_response_dict['pagination']['last_indexes']['last_disbursement_date']
+            # it seemed important to break this out
+            records = api_response_dict['results']
+            results += records
+
+        except ApiException as e:
+            print("Exception when calling DisbursementsApi->schedules_schedule_b_get: %s\n" % e)
+
+    return results
 
 def schedule_b_results_to_rows(results):
     rows = []
@@ -194,7 +222,8 @@ def schedule_b_results_to_rows(results):
     return [column_header_row] + rows
 
 
-results = get_schedule_b_results()
+results = get_all_schedule_b_results()
 google_sheets_values = schedule_b_results_to_rows(results)
+
 
 print(google_sheets_values)
