@@ -1,24 +1,13 @@
-from __future__ import print_function
+import requests
 import time
-from pprint import pprint
 import json
 
 from collections import OrderedDict
 from dotted.collection import DottedDict
 
-import swagger_client as fec_client
-from swagger_client.rest import ApiException
-
 import config
 
-api_key = config.api_key
-
-configuration = fec_client.Configuration()
-configuration.api_key['api_key'] = api_key
-
-configuration.host = 'https://api.open.fec.gov/v1'
-
-disbursements_api = fec_client.DisbursementsApi(fec_client.ApiClient(configuration))
+api_config = config.api_key
 
 dotted_result_keys_to_column_names = OrderedDict({
     'amendment_indicator': 'amendment_indicator',
@@ -155,26 +144,35 @@ dotted_result_keys_to_column_names = OrderedDict({
     'unused_recipient_committee_id': 'unused_recipient_committee_id'
 })
 
-def get_schedule_b_results(
-    committee_id=['C00618389', 'C00637512'],
-    recipient_name=['Jones Day'],
-    disbursement_description=['legal consulting'],
-    sort='-disbursement_date',
-    two_year_transaction_period=[2018, 2020],
-):
+api_key = api_config
+committee_id = 'C00580100' # DJT for president
+recipient_name = 'jones%20day'
+disbursement_description = 'legal%20consulting'
+sort = '-disbursement_date'
+parameters = '?two_year_transaction_period=2020&two_year_transaction_period=2018&api_key={}&committee_id={}&recipient_name={}&disbursement_description={}&sort={}'.format(api_key, committee_id, recipient_name, disbursement_description, sort)
+
+last_indexes = True
+
+while last_indexes is True:
+# Need to limit this to 120 calls per minute
     try:
-        api_response = disbursements_api.schedules_schedule_b_get(
-            api_key,
-            committee_id=committee_id,
-            recipient_name=recipient_name,
-            disbursement_description=disbursement_description,
-            sort=sort,
-            two_year_transaction_period=two_year_transaction_period,
-        )
-        print(api_response)
-        return api_response.to_dict()['results']
-    except ApiException as e:
-        print("Exception when calling DisbursementsApi->schedules_schedule_b_get: %s\n" % e)
+
+        response = requests.get('https://api.open.fec.gov/v1/schedules/schedule_b/{}'.format(parameters))
+        json_response = response.json()
+
+        results = json_response['results']
+        pagination = json_response['pagination']
+
+        last_indexes = pagination.get('last_indexes')
+        last_index = last_indexes.get('last_index')
+        last_disbursement_date = last_indexes.get('last_disbursement_date')
+
+        parameters = parameters + '&last_index={}'.format(last_index) + '&last_disbursement_date={}'.format(last_disbursement_date)
+
+        results += results
+
+return results
+
 
 def schedule_b_results_to_rows(results):
     rows = []
@@ -195,7 +193,7 @@ def schedule_b_results_to_rows(results):
     return [column_header_row] + rows
 
 
-results = get_schedule_b_results()
+#results = get_schedule_b_results()
 google_sheets_values = schedule_b_results_to_rows(results)
 
-print(google_sheets_values)
+#print(google_sheets_values)

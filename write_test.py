@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-import committee_test
+import testcopy
 
 # If modifying these scopes, delete the file token.pickle.
 # MC - Still not sure what this does
@@ -19,7 +19,7 @@ value_input_option = 'RAW'
 
 value_range_body = {
     'majorDimension': 'ROWS',
-    'values': committee_test.google_sheets_values
+    'values': testcopy.google_sheets_values
 }
 
 def main():
