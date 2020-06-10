@@ -154,27 +154,33 @@ parameters = '?two_year_transaction_period=2020&two_year_transaction_period=2018
 last_indexes = True
 loop_count = 0
 
-while last_indexes is True:
+def get_schedule_b_results():
+    results = []
+
+    while last_indexes is True:
 # Need to limit this to 120 calls per minute
 
-    response = requests.get('https://api.open.fec.gov/v1/schedules/schedule_b/{}'.format(parameters))
-    json_response = response.json()
+        response = requests.get('https://api.open.fec.gov/v1/schedules/schedule_b/{}'.format(parameters))
+        json_response = response.json()
 
-    results = json_response['results']
-    pagination = json_response['pagination']
+        results = json_response['results']
+        pagination = json_response['pagination']
 
-    last_indexes = pagination.get('last_indexes')
-    last_index = last_indexes.get('last_index')
-    last_disbursement_date = last_indexes.get('last_disbursement_date')
+        last_indexes = pagination.get('last_indexes')
+        last_index = last_indexes.get('last_index')
+        last_disbursement_date = last_indexes.get('last_disbursement_date')
 
-    parameters = parameters + '&last_index={}'.format(last_index) + '&last_disbursement_date={}'.format(last_disbursement_date)
+        parameters = parameters + '&last_index={}'.format(last_index) + '&last_disbursement_date={}'.format(last_disbursement_date)
 
-    results += results
-    loop_count += 1
-    if loop_count == 5:
-        break
+        results += results
 
-return results
+        loop_count += 1
+        if loop_count == 5:
+            break
+
+        time.sleep(1)
+
+        return results
 
 
 def schedule_b_results_to_rows(results):
@@ -196,7 +202,7 @@ def schedule_b_results_to_rows(results):
     return [column_header_row] + rows
 
 
-#results = get_schedule_b_results()
+results = get_schedule_b_results()
 google_sheets_values = schedule_b_results_to_rows(results)
 
 #print(google_sheets_values)
