@@ -148,11 +148,10 @@ def get_schedule_b_results():
     results = []
 
     api_key = api_config
+    per_page = 100
     committee_id = 'C00580100' # DJT for president
-    recipient_name = 'jones%20day'
-    disbursement_description = 'legal%20consulting'
     sort = '-disbursement_date'
-    parameters = '?two_year_transaction_period=2020&two_year_transaction_period=2018&api_key={}&committee_id={}&recipient_name={}&disbursement_description={}&sort={}'.format(api_key, committee_id, recipient_name, disbursement_description, sort)
+    parameters = '?two_year_transaction_period=2020&two_year_transaction_period=2018&api_key={}&per_page={}&committee_id={}&sort={}'.format(api_key, per_page, committee_id, sort)
 
     last_indexes = True
     loop_count = 0
@@ -175,12 +174,13 @@ def get_schedule_b_results():
         if loop_count == 0:
             parameters = parameters + '&last_index={}'.format(last_index) + '&last_disbursement_date={}'.format(last_disbursement_date)
         else:
-            parameters = '?two_year_transaction_period=2020&two_year_transaction_period=2018&api_key={}&committee_id={}&recipient_name={}&disbursement_description={}&sort={}&last_index={}&last_disbursement_date={}'.format(api_key, committee_id, recipient_name, disbursement_description, sort, last_index, last_disbursement_date)
+            parameters = '?two_year_transaction_period=2020&two_year_transaction_period=2018&api_key={}&per_page={}&committee_id={}&sort={}&last_index={}&last_disbursement_date={}'.format(api_key, per_page, committee_id, sort, last_index, last_disbursement_date)
 
         loop_count += 1
-        if loop_count == 5:
-            break
-
+            if loop_count == 5:
+        break
+        print(loop_count)
+        print(pagination)
         time.sleep(1)
 
     return results
