@@ -163,7 +163,6 @@ def get_schedule_b_results():
         response = requests.get('https://api.open.fec.gov/v1/schedules/schedule_b/{}'.format(parameters))
         json_response = response.json()
 
-        results = json_response['results']
         pagination = json_response['pagination']
 
         last_indexes = pagination.get('last_indexes')
@@ -172,7 +171,7 @@ def get_schedule_b_results():
 
         parameters = parameters + '&last_index={}'.format(last_index) + '&last_disbursement_date={}'.format(last_disbursement_date)
 
-        results += results
+        results += json_respone['results']
 
         loop_count += 1
         if loop_count == 5:
@@ -180,7 +179,7 @@ def get_schedule_b_results():
 
         time.sleep(1)
 
-        return results
+    return results
 
 
 def schedule_b_results_to_rows(results):
