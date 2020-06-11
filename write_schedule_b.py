@@ -6,20 +6,23 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-import test_pagination
+import socket
+socket.setdefaulttimeout(15 * 60)
+
+import get_schedule_b
 
 # If modifying these scopes, delete the file token.pickle.
 # MC - Still not sure what this does
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
-spreadsheetId = '1fkGZ7-2mGxRMe8Opzuf5O2WoiWDswgd-cLt3ozhD1ck'
-range = 'Sheet1'
+spreadsheetId = '1ApcWoaMTIf7ctaqLYp9GarIHBlFRtspaPTPCykUEf6E' #RNC
+range = 'schedule_b'
 value_input_option = 'RAW'
 
 value_range_body = {
     'majorDimension': 'ROWS',
-    'values': test_pagination.google_sheets_values
+    'values': get_schedule_b.google_sheets_values
 }
 
 def main():
@@ -35,7 +38,6 @@ def main():
     response = write.execute()
     result = sheet.values().get(spreadsheetId=spreadsheetId,
                              range=range).execute()
-    read = result.get('values', [])
 
     print(response)
 
