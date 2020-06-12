@@ -16,9 +16,9 @@ import get_schedule_b
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # The ID and range of a sample spreadsheet.
-spreadsheetId = '1ApcWoaMTIf7ctaqLYp9GarIHBlFRtspaPTPCykUEf6E' #RNC
+spreadsheetId = '1VkS75DcPf9dDV1-JAJ_ZYG58U7Pjp7xPqLL2PJuqwh4' #MAGA 2018
 range = 'schedule_b'
-value_input_option = 'RAW'
+value_input_option = 'USER_ENTERED'
 
 value_range_body = {
     'majorDimension': 'ROWS',

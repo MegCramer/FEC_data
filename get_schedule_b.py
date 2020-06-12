@@ -149,17 +149,20 @@ def get_schedule_b_results():
 
     api_key = api_config
     per_page = 100
-    committee_id = 'C00003418' # RNC
+    committee_id = 'C00618371' #MAGA
     sort = '-disbursement_date'
-    parameters = '?two_year_transaction_period=2020&api_key={}&per_page={}&committee_id={}&sort={}'.format(api_key, per_page, committee_id, sort)
+    parameters = '?two_year_transaction_period=2018&api_key={}&per_page={}&committee_id={}&sort={}'.format(api_key, per_page, committee_id, sort)
 
     last_indexes = True
     loop_count = 0
 
+    #print('https://api.open.fec.gov/v1/schedules/schedule_b/{}'.format(parameters))
+
     while last_indexes is not None:
-# Need to limit this to 120 calls per minute
+
         response = requests.get('https://api.open.fec.gov/v1/schedules/schedule_b/{}'.format(parameters))
         json_response = response.json()
+
 
         pagination = json_response['pagination']
 
@@ -171,14 +174,17 @@ def get_schedule_b_results():
 
         results += json_response['results']
 
-        parameters = '?two_year_transaction_period=2020&api_key={}&per_page={}&committee_id={}&sort={}&last_index={}&last_disbursement_date={}'.format(api_key, per_page, committee_id, sort, last_index, last_disbursement_date)
+        parameters = '?two_year_transaction_period=2018&api_key={}&per_page={}&committee_id={}&sort={}&last_index={}&last_disbursement_date={}'.format(api_key, per_page, committee_id, sort, last_index, last_disbursement_date)
+
+        print(pagination)
+        print(last_index)
 
         loop_count += 1
-        #if loop_count == 250:
-        #    break
         print(loop_count)
-        print(pagination)
-        time.sleep(.5)
+        #if loop_count == 200:
+        #    break
+
+        time.sleep(1)
 
     return results
 
@@ -203,5 +209,3 @@ def schedule_b_results_to_rows(results):
 
 results = get_schedule_b_results()
 google_sheets_values = schedule_b_results_to_rows(results)
-
-#print(google_sheets_values)

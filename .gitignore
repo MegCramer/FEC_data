@@ -1,7 +1,5 @@
 config.py
 __pycache__
 *.pyc
-test.py
 credentials.json
 token.pickle
-odds-and-ends/

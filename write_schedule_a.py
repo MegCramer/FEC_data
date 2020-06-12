@@ -15,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 # The ID and range of a sample spreadsheet.
 spreadsheetId = '1fkGZ7-2mGxRMe8Opzuf5O2WoiWDswgd-cLt3ozhD1ck'
 range = 'schedule_a'
-value_input_option = 'RAW'
+value_input_option = 'USER_ENTERED'
 
 value_range_body = {
     'majorDimension': 'ROWS',
