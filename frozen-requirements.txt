@@ -25,4 +25,4 @@ rsa==4.0
 six==1.15.0
 swagger-client==1.0.0
 uritemplate==3.0.1
-urllib3==1.25.9
+urllib3==1.26.5
